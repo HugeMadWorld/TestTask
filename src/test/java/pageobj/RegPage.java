@@ -15,11 +15,12 @@ import java.io.IOException;
 
 public class RegPage {
     private WebDriver driver;
-    private Fillo fillo = new Fillo();
     private Connection connection;
     private Recordset recordset;
     private String strQuery;
     private String result;
+
+    private Fillo fillo = new Fillo();
     public String[] user = new String[10];
     public String[] pass = new String[10];
     public String[] confirmpassword = new String[10];
@@ -29,6 +30,18 @@ public class RegPage {
     public String[] nick = new String[10];
     public String[] word = new String[10];
 
+    public String mainPageVerify = "https://www.redmine.org/";
+    public String projectsVerify = "https://www.redmine.org/projects";
+    public String helpVerify = "https://www.redmine.org/guide";
+    public String loginVerify = "https://www.redmine.org/login";
+    public String footerVerify = "https://www.redmine.org/";
+    public String userError = "Login";
+    public String passError = "Password is";
+    public String confirmPassError = "Password doesn't";
+    public String nameError = "First";
+    public String surnameError = "Last";
+    public String emailError = "Email";
+    public String nickError = "https://www.redmine.org/login";
 
     @FindBy(className = "home")
     public WebElement mainPageLink;
@@ -40,13 +53,6 @@ public class RegPage {
     public WebElement loginLink;
     @FindBy(css = "[href=\"http://www.redmine.org/\"]")
     public WebElement footerLink;
-
-    public String mainPageVerify = "https://www.redmine.org/";
-    public String projectsVerify = "https://www.redmine.org/projects";
-    public String helpVerify = "https://www.redmine.org/guide";
-    public String loginVerify = "https://www.redmine.org/login";
-    public String footerVerify = "https://www.redmine.org/";
-
     @FindBy(id = "user_login")
     public WebElement userInput;
     @FindBy(id = "user_password")
@@ -66,13 +72,10 @@ public class RegPage {
     @FindBy(xpath = "//*[@id=\"errorExplanation\"]/ul")
     public WebElement errorLabel;
 
-    public String userError = "Login";
-    public String passError = "Password is";
-    public String confirmPassError = "Password doesn't";
-    public String nameError = "First";
-    public String surnameError = "Last";
-    public String emailError = "Email";
-    public String nickError = "https://www.redmine.org/login";
+    public RegPage(WebDriver driver) {
+        this.driver = driver;
+        PageFactory.initElements(driver, this);
+    }
 
     public void open() {
         driver.get("https://www.redmine.org/account/register");
@@ -81,12 +84,6 @@ public class RegPage {
     public void verify(String verify) {
         Assert.assertTrue(driver.getCurrentUrl().equals(verify));
     }
-
-    public RegPage(WebDriver driver) {
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-    }
-
 
     public void extractValues() throws FilloException {
         connection=fillo.getConnection("excel.xlsx");
@@ -98,7 +95,7 @@ public class RegPage {
                 word[x] = recordset.getField("Value");
             }
         }catch (Exception e){
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -125,7 +122,9 @@ public class RegPage {
                 email[x] = recordset.getField("Email");
                 nick[x] = recordset.getField("Nick");
             }
-       }catch (Exception e){System.out.println(e);}
+       }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void addValue(WebElement element, String input) {
@@ -134,7 +133,11 @@ public class RegPage {
 
     public void checkErrors() {
         acceptBtn.click();
-        Assert.assertTrue(errorLabel.isDisplayed());
+        try {
+            Assert.assertTrue(errorLabel.isDisplayed());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void closeConn(){
